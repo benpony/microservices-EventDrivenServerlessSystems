@@ -25,7 +25,7 @@ module "rds_instance" {
     database_port               = 3306
     multi_az                    = true
     storage_type                = "gp2"
-    allocated_storage           = 100
+    allocated_storage           = 5
     storage_encrypted           = true
     engine                      = "mysql"
     engine_version              = "5.7.17"
