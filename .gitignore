@@ -1,0 +1,5 @@
+.idea
+.examples/
+mysql_rds/.terraform
+mysql_rds/terraform.tfstate
+mysql_rds/terraform.tfstate.backup
