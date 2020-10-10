@@ -24,7 +24,7 @@ module "rds_instance" {
     database_password           = "secretpassword"
     database_port               = 3306
     multi_az                    = true
-    storage_type                = "gp2"
+    storage_type                = ""
     allocated_storage           = 5
     storage_encrypted           = true
     engine                      = "mysql"
@@ -42,5 +42,5 @@ output "ec2_result" {
 }
 
 output "db_result" {
-  value = module.rds_instance.hostname
+  value = module.rds_instance.instance_address
 }
