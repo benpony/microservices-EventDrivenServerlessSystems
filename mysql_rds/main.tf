@@ -8,9 +8,18 @@ module "instance" {
   instance_type               = "t3.micro"
   vpc_id                      = "vpc-23203c4a"
   subnet                      = "subnet-0bc59770"
-  name                        = "ec2demo"
+  name                        = "ec2serverlessdemodemo"
   stage                       = "dev"
   ssh_key_pair                = ""
+}
+
+resource "aws_security_group_rule" "allow-all" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = "sg-0ede510e68e6d6578"
 }
 
 module "rds_instance" {
@@ -33,6 +42,7 @@ module "rds_instance" {
     publicly_accessible         = true
     subnet_ids                  = ["subnet-0bc59770","subnet-e7c8f38e","subnet-e7c8f38e"]
     vpc_id                      = "vpc-23203c4a"
+    security_group_ids = ["sg-0ede510e68e6d6578"]
 }
 
 output "ec2_result" {
