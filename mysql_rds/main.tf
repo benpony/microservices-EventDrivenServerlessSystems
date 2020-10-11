@@ -15,7 +15,6 @@ module "instance" {
 
 module "rds_instance" {
     source                      = "git::https://github.com/cloudposse/terraform-aws-rds.git?ref=master"
-    namespace                   = "eg"
     name                        = "serverlessdemo"
     host_name                   = "db"
     ca_cert_identifier          = "rds-ca-2019"
@@ -28,11 +27,10 @@ module "rds_instance" {
     allocated_storage           = 5
     storage_encrypted           = true
     engine                      = "mysql"
-    engine_version              = "5.7.17"
-    major_engine_version        = "5.7"
+    engine_version              = "8.0.20"
     instance_class              = "db.t3.micro"
-    db_parameter_group          = "mysql5.7"
-    publicly_accessible         = false
+    db_parameter_group          = "mysql8.0"
+    publicly_accessible         = true
     subnet_ids                  = ["subnet-0bc59770","subnet-e7c8f38e","subnet-e7c8f38e"]
     vpc_id                      = "vpc-23203c4a"
 }

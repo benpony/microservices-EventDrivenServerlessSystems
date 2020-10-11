@@ -6,7 +6,7 @@ provider "aws" {
 data "archive_file" "lines_counter_zip" {
     type        = "zip"
     source_dir  = "./src"
-    output_path = "./src/lines_counter.zip"
+    output_path = "./dist/lines_counter.zip"
 }
 
 module "lines_counter" {

@@ -1,8 +1,8 @@
 import json
 from datetime import datetime
+from linecounter_s3_lambda.lambda_func.src.package import mysql
 import string
 import random
-import mysql.connector
 import boto3
 import os
 
