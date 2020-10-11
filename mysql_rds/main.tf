@@ -3,16 +3,6 @@ provider "aws" {
   profile = "default"
 }
 
-module "instance" {
-  source                      = "git::https://github.com/cloudposse/terraform-aws-ec2-instance.git?ref=master"
-  instance_type               = "t3.micro"
-  vpc_id                      = "vpc-23203c4a"
-  subnet                      = "subnet-0bc59770"
-  name                        = "ec2serverlessdemodemo"
-  stage                       = "dev"
-  ssh_key_pair                = ""
-}
-
 resource "aws_security_group_rule" "allow-all" {
   type              = "ingress"
   from_port         = 3306
@@ -45,9 +35,6 @@ module "rds_instance" {
     security_group_ids = ["sg-0ede510e68e6d6578"]
 }
 
-output "ec2_result" {
-  value = module.instance.public_dns
-}
 
 output "db_result" {
   value = module.rds_instance.instance_address
