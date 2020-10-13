@@ -1,41 +1,18 @@
 import json
-from datetime import datetime
-from linecounter_s3_lambda.lambda_func.src.package import mysql
+import datetime
 import string
 import random
 import boto3
 import os
+from package import pymysql
 
-ENDPOINT = "eg-serverlessdemo.ctsehct8fg1i.eu-west-3.rds.amazonaws.com"
-PORT = "3306"
+ENDPOINT = "serverlessdemo.ctsehct8fg1i.eu-west-3.rds.amazonaws.com"
+PORT = 3306
 USR = "admin"
+PWD = "[SECRET]"
 REGION = "eu-west-3"
-DBNAME = "serverlessdemo"
+DBNAME = "serverlessdemodb"
 os.environ['LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN'] = '1'
-
-# gets the credentials from .aws/credentials
-session = boto3.session.Session(profile_name='RDSCreds')
-client = boto3.client('rds')
-token = client.generate_db_auth_token(
-    DBHostname=ENDPOINT, Port=PORT,
-    DBUsername=USR,
-    Region=REGION
-)
-
-try:
-    conn = mysql.connector.connect(
-        host=ENDPOINT,
-        user=USR,
-        passwd=token,
-        port=PORT,
-        database=DBNAME
-    )
-    cur = conn.cursor()
-    cur.execute("""SELECT now()""")
-    query_results = cur.fetchall()
-    print(query_results)
-except Exception as e:
-    print("Database connection failed due to {}".format(e))
 
 
 def lambda_handler(event, context):
@@ -46,25 +23,65 @@ def lambda_handler(event, context):
     obj = s3.get_object(Bucket=bucket, Key=key)
     body_len = len(obj['Body'].read().decode('utf-8').split("\n"))
 
-    cur.execute(
-        '''
-        create table if not exists Lines
-        (
-            ID string NOT NULL,
-            ObjectPath varchar(255) NOT NULL,
-            Date DATETIME NOT NULL,
-            AmountOfLines int NOT NULL,
-            PRIMARY KEY (ID))
+    try:
+        connection = pymysql.connect(
+            host=ENDPOINT,
+            user=USR,
+            passwd=PWD,
+            port=PORT,
+            database=DBNAME
         )
-        '''
-    )
 
-    cur.execute(
-        f'''
-        insert into Lines (ID, ObjectPath, Date, AmountOfLines) 
-        values("{id_generator()}", "{input_file}","{datetime.now()}","{body_len}")
-        '''
-    )
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT now()""")
+            query_results = cursor.fetchall()
+            print(query_results)
+
+            cursor.execute(
+                f'''
+                create table if not exists `Lines` (
+                  Id VARCHAR(255) NOT NULL,
+                  ObjectPath VARCHAR(255) NOT NULL,
+                  Date DATE NOT NULL,
+                  AmountOfLines BIGINT(8) NOT NULL,
+                  PRIMARY KEY (Id)
+                )
+                '''
+            )
+            result = cursor.fetchone()
+            print(result)
+
+            cursor.execute(
+                f'''
+                insert into
+                  `Lines` (Id, ObjectPath, Date, AmountOfLines)
+                values(
+                    "{id_generator()}",
+                    "{input_file}",
+                    "{datetime.datetime.now()}",
+                    {body_len}
+                  )
+                '''
+            )
+            result = cursor.fetchone()
+            print(result)
+
+        connection.commit()
+
+        print(f'''
+            insert into
+              `Lines` (Id, ObjectPath, Date, AmountOfLines)
+            values(
+                "{id_generator()}",
+                "{input_file}",
+                "{datetime.datetime.now()}",
+                {body_len}
+              )
+        ''')
+    except Exception as e:
+        print("Database connection failed due to {}".format(e))
+    finally:
+        connection.close()
 
     return {
         'statusCode': 200,
