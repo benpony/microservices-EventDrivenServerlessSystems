@@ -3,8 +3,8 @@ import datetime
 import string
 import random
 import boto3
-import os
 from package import pymysql
+import os
 
 ENDPOINT = "serverlessdemo.ctsehct8fg1i.eu-west-3.rds.amazonaws.com"
 PORT = 3306
@@ -20,16 +20,21 @@ def lambda_handler(event, context):
     bucket = str(event["Records"][0]["s3"]["bucket"]["name"])
     key = str(event["Records"][0]["s3"]["object"]["key"])
     input_file = os.path.join(bucket, key)
-    obj = s3.get_object(Bucket=bucket, Key=key)
-    body_len = len(obj['Body'].read().decode('utf-8').split("\n"))
+    file_obj = s3.get_object(Bucket = bucket, Key = key)
+    body_len = len(
+        file_obj['Body']
+            .read()
+            .decode('utf-8')
+            .split("\n")
+    )
 
     try:
         connection = pymysql.connect(
-            host=ENDPOINT,
-            user=USR,
-            passwd=PWD,
-            port=PORT,
-            database=DBNAME
+            host = ENDPOINT,
+            user = USR,
+            passwd = PWD,
+            port = PORT,
+            database = DBNAME
         )
 
         with connection.cursor() as cursor:
