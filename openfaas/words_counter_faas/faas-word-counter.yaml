@@ -4,6 +4,7 @@ provider:
   gateway: http://127.0.0.1:8080
 functions:
   word-counter:
+    lang: python3
     image: functions/alpine:latest
     environment:
       fprocess: "wc -w"
