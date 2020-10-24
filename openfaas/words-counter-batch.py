@@ -14,7 +14,9 @@ s3 = boto3.resource(
 TEMP_PASS = "admin"
 DB_NAME = "serverlessdemodb"
 client = pymongo.MongoClient(
-    f"mongodb+srv://admin:{TEMP_PASS}@cluster0.14ono.mongodb.net/{DB_NAME}?retryWrites=true&w=majority"
+    f"mongodb+srv://admin:{TEMP_PASS}@cluster0.14ono.mongodb.net/{DB_NAME}?retryWrites=true&w=majority",
+    ssl=True,
+    ssl_cert_reqs='CERT_NONE'
 )
 
 for s3object in s3.Bucket(BUCKET_NAME).objects.all():
@@ -34,3 +36,4 @@ for s3object in s3.Bucket(BUCKET_NAME).objects.all():
             "Date": datetime.now(),
             "AmountOfWords": numOfWords
         })
+        print(numOfWords)
