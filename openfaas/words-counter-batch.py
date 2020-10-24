@@ -29,10 +29,15 @@ for s3object in s3.Bucket(BUCKET_NAME).objects.all():
             'http://127.0.0.1:8080/function/word-counter.openfaas-fn',
             data=s3object.get()['Body'].read()
         )
+        numOfWords = response.json()
         db = client.serverlessdemodb
         db.Words.insert_one({
             "ObjectPath": f'''{s3object.bucket_name}/{s3object.key}''',
             "Date": datetime.now(),
-            "AmountOfWords": response.json()
+            "AmountOfWords": numOfWords
         })
-        print('S3 FILE COUNTING DATA HAS BEEN SUCCESSFULLY PERSISTED TO MONGODB')
+        print(f'''
+            S3 FILE ({s3object.key}) 
+            WORDS COUNT ({numOfWords}) 
+            HAS BEEN SUCCESSFULLY PERSISTED TO MONGODB
+        ''')
