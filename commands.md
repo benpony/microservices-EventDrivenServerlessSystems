@@ -17,13 +17,20 @@ use vault cli:
 ```
 $ export VAULT_ADDR="http://127.0.0.1:8200"
 $ vault login
+$ vault secrets enable kv-v2
 ```
 
 ..
 (created db secrets via ui)
 ```
-$ vault secrets list -detailed
+$ vault secrets list
 $ vault kv get kv/db
-$ vault kv get -field=dbpwd kv/db 
+$ vault kv get -field=dbpwd kv/db
+
+$ curl --header "X-Vault-Token: s.A946lZFDo7WOrX9v39d5Gf6h" \
+       --request GET 'https://127.0.0.1:8200/v1/sys/internal/ui/mounts/kv/db' 
+
+$ curl --header "X-Vault-Token: s.A946lZFDo7WOrX9v39d5Gf6h" \
+       --request GET 'http://127.0.0.1:8200/v1/kv/db'
 ```
 - - -

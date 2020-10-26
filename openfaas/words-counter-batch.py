@@ -4,19 +4,30 @@ import boto3
 import requests
 import pymongo
 
+
+'''
+curl --header "X-Vault-Token: s.A946lZFDo7WOrX9v39d5Gf6h" \
+     --request GET 'http://127.0.0.1:8200/v1/kv-v1/db'
+'''
+vault_header = {'X-Vault-Token': 's.A946lZFDo7WOrX9v39d5Gf6h'}
+response = requests.get(
+    'http://127.0.0.1:8200/v1/kv-v1/db',
+    headers= vault_header
+)
+result = response.json()
+DB_PASS = result['data']['pass']
+DB_NAME = result['data']['dbname']
+client = pymongo.MongoClient(
+    f"mongodb+srv://admin:{DB_PASS}@cluster0.14ono.mongodb.net/{DB_NAME}?retryWrites=true&w=majority",
+    ssl=True,
+    ssl_cert_reqs='CERT_NONE'
+)
+
 REGION = "eu-west-3"
 BUCKET_NAME = "bpserverlessdemo"
 s3 = boto3.resource(
     's3',
     region_name=REGION
-)
-
-TEMP_PASS = "admin"
-DB_NAME = "serverlessdemodb"
-client = pymongo.MongoClient(
-    f"mongodb+srv://admin:{TEMP_PASS}@cluster0.14ono.mongodb.net/{DB_NAME}?retryWrites=true&w=majority",
-    ssl=True,
-    ssl_cert_reqs='CERT_NONE'
 )
 
 for s3object in s3.Bucket(BUCKET_NAME).objects.all():
