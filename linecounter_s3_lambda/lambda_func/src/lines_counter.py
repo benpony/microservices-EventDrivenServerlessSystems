@@ -6,7 +6,7 @@ import boto3
 from package import pymysql
 import os
 
-ENDPOINT = "serverlessdemo.ctsehct8fg1i.eu-west-3.rds.amazonaws.com"
+ENDPOINT = "example:serverlessdemo.ctsehct8fg1i.eu-west-3.rds.amazonaws.com"
 PORT = 3306
 USR = "admin"
 PWD = "[SECRET]"
@@ -30,18 +30,14 @@ def lambda_handler(event, context):
 
     try:
         connection = pymysql.connect(
-            host = ENDPOINT,
-            user = USR,
-            passwd = PWD,
-            port = PORT,
-            database = DBNAME
+            host=ENDPOINT,
+            user=USR,
+            passwd=PWD,
+            port=PORT,
+            database=DBNAME
         )
 
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT now()""")
-            query_results = cursor.fetchall()
-            print(query_results)
-
             cursor.execute(
                 f'''
                 create table if not exists `Lines` (
@@ -53,8 +49,6 @@ def lambda_handler(event, context):
                 )
                 '''
             )
-            result = cursor.fetchone()
-            print(result)
 
             cursor.execute(
                 f'''
@@ -68,21 +62,13 @@ def lambda_handler(event, context):
                   )
                 '''
             )
-            result = cursor.fetchone()
-            print(result)
+
+            print(f''' 
+                successfully executed sql insert expression. 
+                result: {cursor.fetchone()} 
+            ''')
 
         connection.commit()
-
-        print(f'''
-            insert into
-              `Lines` (Id, ObjectPath, Date, AmountOfLines)
-            values(
-                "{id_generator()}",
-                "{input_file}",
-                "{datetime.datetime.now()}",
-                {body_len}
-              )
-        ''')
     except Exception as e:
         print("Database connection failed due to {}".format(e))
     finally:

@@ -1,5 +1,5 @@
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
-src_mysql/package
+src/package
 dist
